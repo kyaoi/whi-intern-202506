@@ -5,8 +5,25 @@ const app = express();
 const port = process.env.PORT ?? 8080;
 const database = new EmployeeDatabaseInMemory();
 
+
+
 app.get("/api/employees", async (req: Request, res: Response) => {
     const filterText = req.query.filterText ?? "";
+    // FIXME: いい方法考える（一旦パス）
+    const filterDepartment = req.query.filterDepartment ?? "";
+    const filterPosition = req.query.filterPosition ?? "";
+    const filterSkill = req.query.filterSkill ?? "";
+    let filterDetail = {
+        department: Array.isArray(filterDepartment) ? filterDepartment : [filterDepartment],
+        position: Array.isArray(filterPosition) ? filterPosition : [filterPosition],
+        skill: Array.isArray(filterSkill) ? filterSkill : [filterSkill],
+    };
+    console.log("filterText:", filterText);
+    console.log("filterDepartment:", filterDepartment);
+    console.log("filterPosition:", filterPosition);
+    console.log("filterSkill:", filterSkill);
+    console.log("filterDetail:", filterDetail);
+  
     // req.query is parsed by the qs module.
     // https://www.npmjs.com/package/qs
     if (Array.isArray(filterText)) {
@@ -14,13 +31,13 @@ app.get("/api/employees", async (req: Request, res: Response) => {
         res.status(400).send();
         return;
     }
-    if (typeof filterText !== "string") {
+    if (typeof filterText !== "string" || typeof filterDepartment !== "string" || typeof filterPosition !== "string" || typeof filterSkill !== "string") {
         // Nested query object is not supported
         res.status(400).send();
         return;
     }
     try {
-        const employees = await database.getEmployees(filterText);
+        const employees = await database.getEmployees(filterText, "hoge");
         res.status(200).send(JSON.stringify(employees));
     } catch (e) {
         console.error(`Failed to load the users filtered by ${filterText}.`, e);

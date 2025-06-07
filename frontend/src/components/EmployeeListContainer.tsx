@@ -5,9 +5,11 @@ import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { EmployeeListItem } from "./EmployeeListItem";
 import { Employee, EmployeeT } from "../models/Employee";
+import { FilterOptions } from "@/types/employee";
 
 export type EmployeesContainerProps = {
   filterText: string;
+  filterDetail?: FilterOptions;
 };
 
 const EmployeesT = t.array(EmployeeT);
@@ -25,10 +27,22 @@ const employeesFetcher = async (url: string): Promise<Employee[]> => {
   return decoded.right;
 };
 
-export function EmployeeListContainer({ filterText }: EmployeesContainerProps) {
-  const encodedFilterText = encodeURIComponent(filterText);
+export function EmployeeListContainer({ filterText, filterDetail }: EmployeesContainerProps) {
+  const searchParams = new URLSearchParams();
+  searchParams.append("filterText", filterText);
+  for (const key in filterDetail) {
+    const values = filterDetail[key as keyof FilterOptions];
+    if (values != null) {
+      values.forEach((v) => {
+        searchParams.append(key, v);
+      });
+    }
+  }
+
+  const queryString = searchParams.toString();
+
   const { data, error, isLoading } = useSWR<Employee[], Error>(
-    `/api/employees?filterText=${encodedFilterText}`,
+    `/api/employees?${queryString}`,
     employeesFetcher
   );
   useEffect(() => {
