@@ -1,4 +1,4 @@
-import * as t from "io-ts";
+import * as t from 'io-ts';
 
 export const EmployeeT = t.type({
   id: t.string,
@@ -22,7 +22,7 @@ export type FilterDetail = {
 
 export const convertToArray = (param: string): string[] => {
   return param
-    .split(",")
+    .split(',')
     .map((v) => v.trim())
     .filter((v) => v.length > 0);
 };

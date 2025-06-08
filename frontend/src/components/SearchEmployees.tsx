@@ -1,5 +1,5 @@
-"use client";
-import type { AttributesOptions, SelectOptions } from "@/types/employee";
+'use client';
+import type { AttributesOptions, SelectOptions } from '@/types/employee';
 import {
   Box,
   Button,
@@ -14,13 +14,13 @@ import {
   Paper,
   TextField,
   Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
-import { EmployeeListContainer } from "./EmployeeListContainer";
-import { AddEmployeeButton } from "./AddEmployee";
+} from '@mui/material';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import { EmployeeListContainer } from './EmployeeListContainer';
+import { AddEmployeeButton } from './AddEmployee';
 export function SearchEmployees() {
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState('');
   const [searchDetail, setSearchDetail] = useState<SelectOptions[]>([]);
 
   const [open, setOpen] = useState(false);
@@ -40,8 +40,8 @@ export function SearchEmployees() {
   return (
     <Paper
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         gap: 2,
         flex: 1,
         p: 2,
@@ -50,10 +50,10 @@ export function SearchEmployees() {
       <AddEmployeeButton />
       <Container
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <TextField
@@ -114,9 +114,9 @@ const SearchModal = ({
     <Dialog open={open} onClose={handleNotAcceptChange} maxWidth="sm" fullWidth>
       <Box
         sx={{
-          display: "flex",
+          display: 'flex',
           gap: 2,
-          alignItems: "center",
+          alignItems: 'center',
         }}
       >
         <DialogTitle>詳細検索</DialogTitle>
@@ -167,8 +167,8 @@ const SearchModalContent = ({
   >([]);
 
   const { data, error, isLoading } = useSWR<AttributesOptions[], Error>(
-    "/api/attributes",
-    attributesFetcher
+    '/api/attributes',
+    attributesFetcher,
   );
 
   useEffect(() => {
@@ -179,7 +179,7 @@ const SearchModalContent = ({
 
   useEffect(() => {
     if (error != null) {
-      console.error("Failed to fetch employees filtered by filterName", error);
+      console.error('Failed to fetch employees filtered by filterName', error);
     }
   }, [error]);
 
@@ -207,7 +207,7 @@ const SearchModalContent = ({
         }
 
         return prev.map((f) =>
-          f.key === key ? { ...f, value: newValues } : f
+          f.key === key ? { ...f, value: newValues } : f,
         );
       }
       return [...prev, { key, value: [value] }];
@@ -229,7 +229,7 @@ const SearchModalContent = ({
                   <Checkbox
                     checked={
                       selectedFilters.find(
-                        (f) => f.key === key && f.value.includes(v)
+                        (f) => f.key === key && f.value.includes(v),
                       ) !== undefined
                     }
                     onChange={() => handleCheck(key, v)}

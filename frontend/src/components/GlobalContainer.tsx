@@ -1,27 +1,27 @@
-import { Container } from "@mui/material";
-import { GlobalFooter } from "../components/GlobalFooter";
-import { GlobalHeader } from "../components/GlobalHeader";
-import { VerticalSpacer } from "../components/VerticalSpacer";
+import { Container } from '@mui/material';
+import { GlobalFooter } from '../components/GlobalFooter';
+import { GlobalHeader } from '../components/GlobalHeader';
+import { VerticalSpacer } from '../components/VerticalSpacer';
 
 export function GlobalContainer({
-	children,
-	title,
+  children,
+  title,
 }: { children?: React.ReactNode; title: string }) {
-	return (
-		<Container
-			sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-		>
-			<header>
-				<GlobalHeader title={`タレントマネジメントシステム - ${title}`} />
-			</header>
+  return (
+    <Container
+      sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
+    >
+      <header>
+        <GlobalHeader title={`タレントマネジメントシステム - ${title}`} />
+      </header>
 
-			<VerticalSpacer height={32} />
+      <VerticalSpacer height={32} />
 
-			<main>{children}</main>
+      <main>{children}</main>
 
-			<footer>
-				<GlobalFooter />
-			</footer>
-		</Container>
-	);
+      <footer>
+        <GlobalFooter />
+      </footer>
+    </Container>
+  );
 }
