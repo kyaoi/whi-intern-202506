@@ -1,6 +1,10 @@
 import cors from "cors";
 import express, { type Request, type Response } from "express";
-import { type FilterDetail, convertToArray } from "./employee/Employee";
+import {
+  EmployeeT,
+  type FilterDetail,
+  convertToArray,
+} from "./employee/Employee";
 import { EmployeeDatabaseInMemory } from "./employee/EmployeeDatabaseInMemory";
 const app = express();
 app.use(cors());
