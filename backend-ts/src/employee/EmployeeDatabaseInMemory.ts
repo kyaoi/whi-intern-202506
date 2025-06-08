@@ -2,24 +2,49 @@ import { EmployeeDatabase } from "./EmployeeDatabase";
 import { Employee } from "./Employee";
 
 export class EmployeeDatabaseInMemory implements EmployeeDatabase {
-    private employees: Map<string, Employee>
+  private employees: Map<string, Employee>;
 
-    constructor() {
-        this.employees = new Map<string, Employee>();
-        this.employees.set("1", { id: "1", name: "Jane Doe", age: 22 });
-        this.employees.set("2", { id: "2", name: "John Smith", age: 28 });
-        this.employees.set("3", { id: "3", name: "山田 太郎", age: 27 });
-    }
+  constructor() {
+    this.employees = new Map<string, Employee>();
+    this.employees.set("1", {
+      id: "1",
+      name: "Jane Doe",
+      age: 22,
+      department: "営業",
+      position: "スタッフ",
+      skill: ["Python"],
+    });
+    this.employees.set("2", {
+      id: "2",
+      name: "John Smith",
+      age: 28,
+      department: "開発",
+      position: "リーダー",
+      skill: ["JavaScript"],
+    });
+    this.employees.set("3", {
+      id: "3",
+      name: "山田 太郎",
+      age: 27,
+      department: "人事",
+      position: "マネージャー",
+      skill: ["Excel", "採用"],
+    });
+  }
 
-    async getEmployee(id: string): Promise<Employee | undefined> {
-        return this.employees.get(id);
-    }
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    return this.employees.get(id);
+  }
 
-    async getEmployees(filterText: string): Promise<Employee[]> {
-        const employees = Array.from(this.employees.values());
-        if (filterText === "") {
-            return employees;
-        }
-        return employees.filter(employee => employee.name === filterText);
+  async getEmployees(filterText: string): Promise<Employee[]> {
+    const employees = Array.from(this.employees.values());
+    if (filterText === "") {
+      return employees;
     }
+    return employees.filter((employee) => employee.name === filterText);
+  }
+
+  async addEmployee(employee: Employee): Promise<void> {
+    this.employees.set(employee.id, employee);
+  }
 }
