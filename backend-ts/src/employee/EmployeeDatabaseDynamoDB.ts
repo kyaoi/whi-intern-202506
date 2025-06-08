@@ -55,10 +55,11 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
       return [];
     }
     return items
-      .filter((item) => {
-        const name = item["name"]?.S?.toLowerCase();
-        return filterText === "" || name?.includes(filterText.toLowerCase());
-      })
+      .filter(
+        (item) =>
+          filterText === "" ||
+          item["name"]?.S?.toLowerCase().includes(filterText.toLowerCase())
+      )
       .map((item) => {
         return {
           id: item["id"].S,

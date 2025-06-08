@@ -1,0 +1,56 @@
+diff --git a/frontend/next.config.ts b/frontend/next.config.ts
+index 097adcf..2240deb 100644
+--- a/frontend/next.config.ts
++++ b/frontend/next.config.ts
+@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
+ 
+ const nextConfig: NextConfig = {
+   /* config options here */
+-  // Proxy API calls for development
++  // Settings for single page app
++  output: "export", // Depends on how we deploy the app
++  // Proxy API calls in case of SPA.
+   async rewrites() {
+     return [
+       {
+diff --git a/frontend/src/app/employee/[id]/page.tsx b/frontend/src/app/employee/page.tsx
+similarity index 100%
+rename from frontend/src/app/employee/[id]/page.tsx
+rename to frontend/src/app/employee/page.tsx
+diff --git a/frontend/src/components/EmployeeDetailsContainer.tsx b/frontend/src/components/EmployeeDetailsContainer.tsx
+index 81c8c5c..516ccf3 100644
+--- a/frontend/src/components/EmployeeDetailsContainer.tsx
++++ b/frontend/src/components/EmployeeDetailsContainer.tsx
+@@ -3,7 +3,7 @@ import { useEffect } from "react";
+ import useSWR from "swr";
+ import { isLeft } from "fp-ts/Either";
+ import { Employee, EmployeeT } from "../models/Employee";
+-import { useParams } from "next/navigation";
++import { useSearchParams } from "next/navigation";
+ import { EmployeeDetails } from "./EmployeeDetails";
+ 
+ const employeeFetcher = async (url: string): Promise<Employee> => {
+@@ -20,8 +20,8 @@ const employeeFetcher = async (url: string): Promise<Employee> => {
+ };
+ 
+ export function EmployeeDetailsContainer() {
+-  const params = useParams<{id: string}>();
+-  const id = params.id;
++  const id = useSearchParams().get("id");
++
+   const { data, error, isLoading } = useSWR<Employee, Error>(
+     `/api/employees/${id}`,
+     employeeFetcher
+diff --git a/frontend/src/components/EmployeeListItem.tsx b/frontend/src/components/EmployeeListItem.tsx
+index 08812e5..bdb0532 100644
+--- a/frontend/src/components/EmployeeListItem.tsx
++++ b/frontend/src/components/EmployeeListItem.tsx
+@@ -12,7 +12,7 @@ export function EmployeeListItem(prop: EmployeeListItemProps) {
+   const employee = prop.employee;
+   return (
+     <Link
+-      href={`/employee/${employee.id}`}
++      href={`/employee?id=${employee.id}`}
+       style={{ textDecoration: "none" }}
+     >
+       <Card
