@@ -6,7 +6,7 @@ import {
 	type ScanCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { isLeft } from "fp-ts/Either";
-import { type Employee, EmployeeT } from "./Employee";
+import { type Employee, EmployeeT, type FilterDetail } from "./Employee";
 import type { EmployeeDatabase } from "./EmployeeDatabase";
 
 export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
@@ -45,7 +45,11 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
 		}
 	}
 
-	async getEmployees(filterText: string): Promise<Employee[]> {
+	// TODO: 詳細検索こっちはやってない
+	async getEmployees(
+		filterName: string,
+		filterDetail: FilterDetail,
+	): Promise<Employee[]> {
 		const input: ScanCommandInput = {
 			TableName: this.tableName,
 		};
@@ -57,7 +61,7 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
 		return items
 			.filter((item) => {
 				const name = item["name"]?.S?.toLowerCase();
-				return filterText === "" || name?.includes(filterText.toLowerCase());
+				return filterName === "" || name?.includes(filterName.toLowerCase());
 			})
 			.map((item) => {
 				return {
