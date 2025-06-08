@@ -1,14 +1,16 @@
 import {
-  DynamoDBClient,
+  type DynamoDBClient,
   GetItemCommand,
-  GetItemCommandInput,
+  type GetItemCommandInput,
   ScanCommand,
-  ScanCommandInput,
+  type ScanCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { isLeft } from "fp-ts/Either";
-import { EmployeeDatabase } from "./EmployeeDatabase";
-import { Employee, EmployeeT } from "./Employee";
+
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { type Employee, EmployeeT, type FilterDetail } from "./Employee";
+import type { EmployeeDatabase } from "./EmployeeDatabase";
+
 export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
   private client: DynamoDBClient;
   private tableName: string;
@@ -33,7 +35,7 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     const employee = {
       id: id,
       name: item["name"].S,
-      age: mapNullable(item["age"].N, (value) => parseInt(value, 10)),
+      age: mapNullable(item["age"].N, (value) => Number.parseInt(value, 10)),
     };
     const decoded = EmployeeT.decode(employee);
     if (isLeft(decoded)) {
@@ -45,7 +47,23 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     }
   }
 
-  async getEmployees(filterText: string): Promise<Employee[]> {
+  async addEmployee(employee: Employee): Promise<void> {
+    await this.client.send(
+      new PutItemCommand({
+        TableName: this.tableName,
+        Item: {
+          id: { S: employee.id },
+          name: { S: employee.name },
+          age: { N: employee.age.toString() },
+        },
+      })
+    );
+  }
+  // TODO: 詳細検索こっちはやってない
+  async getEmployees(
+    filterName: string,
+    filterDetail: FilterDetail
+  ): Promise<Employee[]> {
     const input: ScanCommandInput = {
       TableName: this.tableName,
     };
@@ -57,13 +75,15 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
     return items
       .filter((item) => {
         const name = item["name"]?.S?.toLowerCase();
-        return filterText === "" || name?.includes(filterText.toLowerCase());
+        return filterName === "" || name?.includes(filterName.toLowerCase());
       })
       .map((item) => {
         return {
           id: item["id"].S,
           name: item["name"].S,
-          age: mapNullable(item["age"].N, (value) => parseInt(value, 10)),
+          age: mapNullable(item["age"].N, (value) =>
+            Number.parseInt(value, 10)
+          ),
         };
       })
       .flatMap((employee) => {
@@ -79,18 +99,6 @@ export class EmployeeDatabaseDynamoDB implements EmployeeDatabase {
           return [decoded.right];
         }
       });
-  }
-  async addEmployee(employee: Employee): Promise<void> {
-    await this.client.send(
-      new PutItemCommand({
-        TableName: this.tableName,
-        Item: {
-          id: { S: employee.id },
-          name: { S: employee.name },
-          age: { N: employee.age.toString() },
-        },
-      })
-    );
   }
 }
 

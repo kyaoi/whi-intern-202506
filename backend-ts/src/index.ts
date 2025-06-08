@@ -1,9 +1,5 @@
 import express, { Request, Response } from "express";
 import { EmployeeDatabaseInMemory } from "./employee/EmployeeDatabaseInMemory";
-import { EmployeeDatabaseDynamoDB } from "./employee/EmployeeDatabaseDynamoDB";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { EmployeeT } from "./employee/Employee";
-import cors from "cors";
 
 const app = express();
 app.use(cors());
@@ -11,24 +7,38 @@ const port = process.env.PORT ?? 8080;
 const database = new EmployeeDatabaseInMemory();
 
 app.get("/api/employees", async (req: Request, res: Response) => {
-  const filterText = req.query.filterText ?? "";
+  const filterName = req.query.filterName ?? "";
+  const filterDepartment = req.query.department ?? "";
+  const filterPosition = req.query.position ?? "";
+  const filterSkill = req.query.skill ?? "";
   // req.query is parsed by the qs module.
   // https://www.npmjs.com/package/qs
-  if (Array.isArray(filterText)) {
-    // Multiple filterText is not supported
+  if (Array.isArray(filterName)) {
+    // Multiple filterName is not supported
     res.status(400).send();
     return;
   }
-  if (typeof filterText !== "string") {
+  if (
+    typeof filterName !== "string" ||
+    typeof filterDepartment !== "string" ||
+    typeof filterPosition !== "string" ||
+    typeof filterSkill !== "string"
+  ) {
     // Nested query object is not supported
     res.status(400).send();
     return;
   }
+  const filterDetail: FilterDetail = {
+    department: convertToArray(filterDepartment),
+    position: convertToArray(filterPosition),
+    skill: convertToArray(filterSkill),
+  };
+
   try {
-    const employees = await database.getEmployees(filterText);
+    const employees = await database.getEmployees(filterName, filterDetail);
     res.status(200).send(JSON.stringify(employees));
   } catch (e) {
-    console.error(`Failed to load the users filtered by ${filterText}.`, e);
+    console.error(`Failed to load the users filtered by ${filterName}.`, e);
     res.status(500).send();
   }
 });
@@ -44,6 +54,30 @@ app.get("/api/employees/:userId", async (req: Request, res: Response) => {
     res.status(200).send(JSON.stringify(employee));
   } catch (e) {
     console.error(`Failed to load the user ${userId}.`, e);
+    res.status(500).send();
+  }
+});
+
+// TODO: ここは別のディレクトリ移動する
+// TODO: アーキテクチャに沿ったやり方に変更
+app.get("/api/attributes", async (req: Request, res: Response) => {
+  try {
+    const attribute = await database.getAttributes();
+    res.status(200).send(JSON.stringify(attribute));
+  } catch (e) {
+    console.error("Failed to load the attributes", e);
+    res.status(500).send();
+  }
+});
+
+// TODO: ここは別のディレクトリ移動する
+// TODO: アーキテクチャに沿ったやり方に変更
+app.get("/api/attributes", async (req: Request, res: Response) => {
+  try {
+    const attribute = await database.getAttributes();
+    res.status(200).send(JSON.stringify(attribute));
+  } catch (e) {
+    console.error("Failed to load the attributes", e);
     res.status(500).send();
   }
 });

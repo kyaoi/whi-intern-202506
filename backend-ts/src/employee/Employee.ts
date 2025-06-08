@@ -10,3 +10,19 @@ export const EmployeeT = t.type({
 });
 
 export type Employee = t.TypeOf<typeof EmployeeT>;
+export const employeeKeys = Object.keys(EmployeeT.props) as Array<
+  keyof Employee
+>;
+
+export type FilterDetail = {
+  department: string[];
+  position: string[];
+  skill: string[];
+};
+
+export const convertToArray = (param: string): string[] => {
+  return param
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0);
+};
