@@ -2,6 +2,20 @@
 import { Paper, TextField, Button, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Employee } from "../models/Employee";
+import { useRouter } from "next/navigation";
+
+export function AddEmployeeButton() {
+  const router = useRouter(); // ルーターを初期化
+
+  return (
+    <Button
+      variant="contained"
+      onClick={() => router.push("/add-employee")} // ページ遷移
+    >
+      従業員を追加
+    </Button>
+  );
+}
 
 export function AddEmployeeForm() {
   const [employee, setEmployee] = useState<Employee>({

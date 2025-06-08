@@ -2,7 +2,7 @@
 import { Paper, TextField } from "@mui/material";
 import { useState } from "react";
 import { EmployeeListContainer } from "./EmployeeListContainer";
-
+import { AddEmployeeButton } from "./AddEmployee";
 export function SearchEmployees() {
   const [searchKeyword, setSearchKeyword] = useState("");
   return (
@@ -15,6 +15,7 @@ export function SearchEmployees() {
         p: 2,
       }}
     >
+      <AddEmployeeButton />
       <TextField
         placeholder="検索キーワードを入力してください"
         value={searchKeyword}
