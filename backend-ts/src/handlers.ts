@@ -3,16 +3,13 @@ import type {
 	LambdaFunctionURLEvent,
 	LambdaFunctionURLResult,
 } from "aws-lambda";
-import type { Employee, FilterDetail } from "./employee/Employee";
+import {
+	type Employee,
+	type FilterDetail,
+	convertToArray,
+} from "./employee/Employee";
 import type { EmployeeDatabase } from "./employee/EmployeeDatabase";
 import { EmployeeDatabaseDynamoDB } from "./employee/EmployeeDatabaseDynamoDB";
-
-const convertToArray = (param: string): string[] => {
-	return param
-		.split(",")
-		.map((v) => v.trim())
-		.filter((v) => v.length > 0);
-};
 
 const getEmployeeHandler = async (
 	database: EmployeeDatabase,
@@ -71,11 +68,7 @@ export const handle = async (
 		};
 
 		if (path === "/api/employees") {
-			return getEmployeesHandler(
-				database,
-				query?.filterText ?? "",
-				filterDetail,
-			);
+			return getEmployeesHandler(database, filterName, filterDetail);
 		} else if (path.startsWith("/api/employees/")) {
 			const id = path.substring("/api/employees/".length);
 			return getEmployeeHandler(database, id);

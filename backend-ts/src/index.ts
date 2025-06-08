@@ -1,17 +1,10 @@
 import express, { type Request, type Response } from "express";
-import type { FilterDetail } from "./employee/Employee";
+import { type FilterDetail, convertToArray } from "./employee/Employee";
 import { EmployeeDatabaseInMemory } from "./employee/EmployeeDatabaseInMemory";
 
 const app = express();
 const port = process.env.PORT ?? 8080;
 const database = new EmployeeDatabaseInMemory();
-
-const convertToArray = (param: string): string[] => {
-	return param
-		.split(",")
-		.map((v) => v.trim())
-		.filter((v) => v.length > 0);
-};
 
 app.get("/api/employees", async (req: Request, res: Response) => {
 	const filterName = req.query.filterName ?? "";

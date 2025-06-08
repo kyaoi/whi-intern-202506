@@ -19,3 +19,10 @@ export type FilterDetail = {
 	position: string[];
 	skill: string[];
 };
+
+export const convertToArray = (param: string): string[] => {
+	return param
+		.split(",")
+		.map((v) => v.trim())
+		.filter((v) => v.length > 0);
+};
