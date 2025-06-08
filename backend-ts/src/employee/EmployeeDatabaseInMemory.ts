@@ -41,10 +41,8 @@ export class EmployeeDatabaseInMemory implements EmployeeDatabase {
     if (filterText === "") {
       return employees;
     }
-    return employees.filter((employee) => employee.name === filterText);
-  }
-
-  async addEmployee(employee: Employee): Promise<void> {
-    this.employees.set(employee.id, employee);
+    return employees.filter((employee) =>
+      employee.name.toLowerCase().includes(filterText.toLowerCase())
+    );
   }
 }
