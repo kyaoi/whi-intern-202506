@@ -15,15 +15,13 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { EmployeeListContainer } from "./EmployeeListContainer";
 
 export function SearchEmployees() {
 	const [searchKeyword, setSearchKeyword] = useState("");
-	const [searchDetail, setSearchDetail] = useState<FilterOptions | undefined>(
-		undefined,
-	);
-	console.log("searchDetail", searchDetail);
+	const [searchDetail, setSearchDetail] = useState<FilterOptions[]>([]);
 
 	const [open, setOpen] = useState(false);
 
@@ -31,9 +29,7 @@ export function SearchEmployees() {
 		setOpen(true);
 	};
 
-	const handleAccept = (data: FilterOptions) => {
-		console.log("data", data);
-
+	const handleAccept = (data: FilterOptions[]) => {
 		setOpen(false);
 		setSearchDetail(data);
 	};
@@ -85,7 +81,7 @@ export function SearchEmployees() {
 }
 
 type SearchModalProps = {
-	handleAccept: (data: FilterOptions) => void;
+	handleAccept: (data: FilterOptions[]) => void;
 	handleCancel: () => void;
 	open: boolean;
 };
@@ -95,78 +91,124 @@ const SearchModal = ({
 	handleAccept,
 	handleCancel,
 }: SearchModalProps) => {
-	// 仮データ
-	const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-		department: ["Development", "Sales", "マーケティング"],
-		position: ["マネージャー", "デザイナー"],
-		skill: ["React", "Vue", "Go", "Photoshop", "Leadership"],
-	});
-
-	const [selectedFilters, setSelectedFilters] = useState<{
-		[key: string]: string[];
-	}>({});
-
-	const handleCheck = (key: string, value: string) => {
-		setSelectedFilters((prev) => {
-			const current = prev[key] ?? [];
-			const newValues = current.includes(value)
-				? current.filter((v) => v !== value)
-				: [...current, value];
-			return {
-				...prev,
-				[key]: newValues,
-			};
-		});
-	};
+	const [selectedFilters, setSelectedFilters] = useState<FilterOptions[]>([]);
 
 	return (
-		<Dialog
-			open={open}
-			onClose={() => handleAccept(selectedFilters)}
-			maxWidth="sm"
-			fullWidth
-		>
+		<Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
 			<DialogTitle>詳細検索</DialogTitle>
-			<DialogContent>
-				{Object.entries(employeeKeys).map(([key, label]) => (
-					<Box key={key} mb={2}>
-						<Typography variant="subtitle1" gutterBottom>
-							{label}
-						</Typography>
-						<FormGroup>
-							{filterOptions[key as keyof typeof employeeKeys]?.map(
-								(option) => (
-									<FormControlLabel
-										key={option}
-										control={
-											<Checkbox
-												checked={
-													selectedFilters[key]?.includes(option) ?? false
-												}
-												onChange={() => handleCheck(key, option)}
-											/>
-										}
-										label={option}
-									/>
-								),
-							)}
-						</FormGroup>
-					</Box>
-				))}
-			</DialogContent>
+			<SearchModalContent
+				selectedFilters={selectedFilters}
+				setSelectedFilters={setSelectedFilters}
+			/>
 			<DialogActions>
-				<Button onClick={handleCancel} variant="contained">
+				<Button onClick={handleCancel} variant="outlined">
 					キャンセル
 				</Button>
 				<Button
-					onClick={() => {
-						console.log("selectedFilters", selectedFilters);
-						handleAccept(selectedFilters);
-					}}
+					onClick={() => handleAccept(selectedFilters)}
+					variant="contained"
 				>
 					検索
 				</Button>
 			</DialogActions>
 		</Dialog>
+	);
+};
+
+const attributesFetcher = async (url: string): Promise<FilterOptions[]> => {
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch employees at ${url}`);
+	}
+	const body = await response.json();
+	return body;
+};
+
+type SearchModalContentProps = {
+	selectedFilters: FilterOptions[];
+	setSelectedFilters: React.Dispatch<React.SetStateAction<FilterOptions[]>>;
+};
+
+const mockData = [
+	{ key: "department", value: ["Development", "Sales", "マーケティング"] },
+	{ key: "position", value: ["マネージャー", "デザイナー"] },
+	{ key: "skill", value: ["React", "Vue", "Go", "Photoshop", "Leadership"] },
+];
+
+const SearchModalContent = ({
+	selectedFilters,
+	setSelectedFilters,
+}: SearchModalContentProps) => {
+	// FIXME: replace mock data
+	const [filterOptions, setFilterOptions] = useState<FilterOptions[]>(mockData);
+
+	const { data, error, isLoading } = useSWR<FilterOptions[], Error>(
+		"/api/attributes",
+		attributesFetcher,
+	);
+	useEffect(() => {
+		if (error != null) {
+			console.error("Failed to fetch employees filtered by filterName", error);
+		}
+	}, [error]);
+	if (data != null) {
+		setFilterOptions(data);
+	}
+
+	if (isLoading) {
+		return <p>Loading...</p>;
+	}
+
+	const handleCheck = (key: string, value: string) => {
+		setSelectedFilters((prev) => {
+			const existing = prev.find((f) => f.key === key);
+			if (existing) {
+				const alreadySelected = existing.value.includes(value);
+				const newValues = alreadySelected
+					? existing.value.filter((v) => v !== value)
+					: [...existing.value, value];
+
+				if (newValues.length === 0) {
+					return prev.filter((f) => f.key !== key);
+				}
+
+				return prev.map((f) =>
+					f.key === key ? { ...f, value: newValues } : f,
+				);
+			}
+			return [...prev, { key, value: [value] }];
+		});
+	};
+
+	return (
+		<DialogContent>
+			{employeeKeys.map(({ key, label }) => (
+				<Box key={key} mb={2}>
+					<Typography variant="subtitle1" gutterBottom>
+						{label}
+					</Typography>
+					<FormGroup>
+						{filterOptions
+							?.find((opt) => opt.key === key)
+							?.value.map((v) => (
+								<FormControlLabel
+									key={v}
+									control={
+										<Checkbox
+											checked={
+												selectedFilters.find(
+													(f) => f.key === key && f.value.includes(v),
+												) !== undefined
+											}
+											onChange={() => handleCheck(key, v)}
+										/>
+									}
+									label={v}
+								/>
+							))}
+					</FormGroup>
+				</Box>
+			))}
+		</DialogContent>
 	);
 };

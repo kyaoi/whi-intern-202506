@@ -1,12 +1,20 @@
 // NOTE: 新しく追加したときにはここにも追加する
-export const employeeKeys = {
-  department: "所属",
-  position: "役職",
-  skill: "スキル",
-}
+export const employeeKeys = [
+	{
+		key: "department",
+		label: "所属",
+	},
+	{
+		key: "position",
+		label: "役職",
+	},
+	{
+		key: "skill",
+		label: "スキル",
+	},
+];
 
 export type FilterOptions = {
-  [K in keyof typeof employeeKeys]?: string[];
+	key: string;
+	value: string[];
 };
-
-

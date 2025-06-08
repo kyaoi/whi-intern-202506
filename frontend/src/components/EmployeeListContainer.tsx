@@ -9,7 +9,7 @@ import { EmployeeListItem } from "./EmployeeListItem";
 
 export type EmployeesContainerProps = {
 	filterName: string;
-	filterDetail?: FilterOptions;
+	filterDetail: FilterOptions[];
 };
 
 const EmployeesT = t.array(EmployeeT);
@@ -33,12 +33,11 @@ export function EmployeeListContainer({
 }: EmployeesContainerProps) {
 	const searchParams = new URLSearchParams();
 	searchParams.append("filterName", filterName);
-	for (const key in filterDetail) {
-		const values = filterDetail[key as keyof FilterOptions];
-		if (values != null) {
-			searchParams.append(key, values.join(","));
+	filterDetail.forEach(({ key, value }) => {
+		if (value.length > 0) {
+			searchParams.append(key, value.join(","));
 		}
-	}
+	});
 
 	const queryString = searchParams.toString();
 
