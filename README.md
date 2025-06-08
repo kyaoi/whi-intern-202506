@@ -135,3 +135,12 @@ AWS にデプロイするには、cdk-ts 以下で`deploy.bash`を実行しま�
 cd cdk-ts
 ./deploy.bash
 ```
+
+
+
+## Format
+プロジェクトルート（このREADMEがおいてある場所）に移動して以下のコマンドを実行
+
+```sh
+make format
+```
