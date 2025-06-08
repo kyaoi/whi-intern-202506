@@ -93,9 +93,23 @@ const SearchModal = ({
 }: SearchModalProps) => {
 	const [selectedFilters, setSelectedFilters] = useState<SelectOptions[]>([]);
 
+	const handleRest = () => {
+		setSelectedFilters([]);
+	};
 	return (
 		<Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
-			<DialogTitle>詳細検索</DialogTitle>
+			<Box
+				sx={{
+					display: "flex",
+					gap: 2,
+					alignItems: "center",
+				}}
+			>
+				<DialogTitle>詳細検索</DialogTitle>
+				<Button variant="outlined" onClick={handleRest}>
+					リセット
+				</Button>
+			</Box>
 			<SearchModalContent
 				selectedFilters={selectedFilters}
 				setSelectedFilters={setSelectedFilters}
