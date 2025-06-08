@@ -92,12 +92,25 @@ const SearchModal = ({
 	handleCancel,
 }: SearchModalProps) => {
 	const [selectedFilters, setSelectedFilters] = useState<SelectOptions[]>([]);
+	const [backupFilters, setBackupFilters] = useState<SelectOptions[]>([]);
 
-	const handleRest = () => {
+	const handleReset = () => {
+		setBackupFilters(selectedFilters);
 		setSelectedFilters([]);
 	};
+
+	const handleAcceptChange = (data: SelectOptions[]) => {
+		handleAccept(data);
+		setBackupFilters(data);
+	};
+
+	const handleNotAcceptChange = () => {
+		handleCancel();
+		setSelectedFilters(backupFilters);
+	};
+
 	return (
-		<Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
+		<Dialog open={open} onClose={handleNotAcceptChange} maxWidth="sm" fullWidth>
 			<Box
 				sx={{
 					display: "flex",
@@ -106,7 +119,7 @@ const SearchModal = ({
 				}}
 			>
 				<DialogTitle>詳細検索</DialogTitle>
-				<Button variant="outlined" onClick={handleRest}>
+				<Button variant="outlined" onClick={handleReset}>
 					リセット
 				</Button>
 			</Box>
@@ -115,11 +128,11 @@ const SearchModal = ({
 				setSelectedFilters={setSelectedFilters}
 			/>
 			<DialogActions>
-				<Button onClick={handleCancel} variant="outlined">
+				<Button onClick={handleNotAcceptChange} variant="outlined">
 					キャンセル
 				</Button>
 				<Button
-					onClick={() => handleAccept(selectedFilters)}
+					onClick={() => handleAcceptChange(selectedFilters)}
 					variant="contained"
 				>
 					検索
@@ -135,7 +148,6 @@ const attributesFetcher = async (url: string): Promise<AttributesOptions[]> => {
 		throw new Error(`Failed to fetch employees at ${url}`);
 	}
 	const body = await response.json();
-	console.log("Fetched attributes:", body);
 
 	return body;
 };
@@ -160,7 +172,6 @@ const SearchModalContent = ({
 
 	useEffect(() => {
 		if (data) {
-			console.log("Fetched filter options:", data);
 			setAttributesOptions(data);
 		}
 	}, [data]);
