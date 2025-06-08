@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // Settings for single page app
   output: "export", // Depends on how we deploy the app
   // Proxy API calls in case of SPA.
+
   async rewrites() {
     return [
       {
