@@ -1,8 +1,8 @@
-import PersonIcon from "@mui/icons-material/Person";
+import PersonIcon from '@mui/icons-material/Person';
 
-import { Avatar, Box, Card, CardContent, Typography } from "@mui/material";
-import { Employee } from "../models/Employee";
-import Link from "next/link";
+import { Avatar, Box, Card, CardContent, Typography } from '@mui/material';
+import { Employee } from '../models/Employee';
+import Link from 'next/link';
 
 export type EmployeeListItemProps = {
   employee: Employee;
@@ -13,13 +13,13 @@ export function EmployeeListItem(prop: EmployeeListItemProps) {
   return (
     <Link
       href={`/employee?id=${employee.id}`}
-      style={{ textDecoration: "none" }}
+      style={{ textDecoration: 'none' }}
     >
       <Card
         sx={{
-          transition: "background-color 0.2s",
-          "&:hover": {
-            backgroundColor: "#f0f0f0",
+          transition: 'background-color 0.2s',
+          '&:hover': {
+            backgroundColor: '#f0f0f0',
           },
         }}
       >
