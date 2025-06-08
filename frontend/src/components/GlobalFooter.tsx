@@ -1,16 +1,16 @@
-import { Box, Button, Paper } from "@mui/material";
-import Image from "next/image";
+import { Box, Button, Paper } from '@mui/material';
+import Image from 'next/image';
 
 export function GlobalFooter() {
   return (
     <Paper
       sx={{
-        position: "fixed",
+        position: 'fixed',
         bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        justifyContent: "center",
-        display: "flex",
+        left: '50%',
+        transform: 'translateX(-50%)',
+        justifyContent: 'center',
+        display: 'flex',
         gap: 4,
         px: 8,
         py: 1,

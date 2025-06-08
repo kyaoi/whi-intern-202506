@@ -1,6 +1,10 @@
-import { Employee } from "./Employee";
+import type { Employee, FilterDetail } from './Employee';
 
 export interface EmployeeDatabase {
-    getEmployee(id: string): Promise<Employee | undefined>
-    getEmployees(filterText: string): Promise<Employee[]>
+  addEmployee(employee: Employee): Promise<void>;
+  getEmployee(id: string): Promise<Employee | undefined>;
+  getEmployees(
+    filterName: string,
+    filterDetail: FilterDetail,
+  ): Promise<Employee[]>;
 }

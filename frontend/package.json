@@ -16,6 +16,7 @@
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.0.2",
     "@mui/material-nextjs": "^7.1.0",
+    "cors": "^2.8.5",
     "io-ts": "^2.2.22",
     "next": "15.3.0",
     "react": "^19.0.0",
@@ -23,7 +24,9 @@
     "swr": "^2.3.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@eslint/eslintrc": "^3",
+    "@types/cors": "^2.8.19",
     "@types/jest": "^29.5.14",
     "@types/node": "^20",
     "@types/react": "^19",

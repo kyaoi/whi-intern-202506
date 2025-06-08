@@ -1,13 +1,15 @@
-"use client";
-import { useEffect } from "react";
-import useSWR from "swr";
-import * as t from "io-ts";
-import { isLeft } from "fp-ts/Either";
-import { EmployeeListItem } from "./EmployeeListItem";
-import { Employee, EmployeeT } from "../models/Employee";
+'use client';
+import type { FilterOptions } from '@/types/employee';
+import { isLeft } from 'fp-ts/Either';
+import * as t from 'io-ts';
+import { useEffect } from 'react';
+import useSWR from 'swr';
+import { type Employee, EmployeeT } from '../models/Employee';
+import { EmployeeListItem } from './EmployeeListItem';
 
 export type EmployeesContainerProps = {
-  filterText: string;
+  filterName: string;
+  filterDetail: FilterOptions[];
 };
 
 const EmployeesT = t.array(EmployeeT);
@@ -25,17 +27,29 @@ const employeesFetcher = async (url: string): Promise<Employee[]> => {
   return decoded.right;
 };
 
-export function EmployeeListContainer({ filterText }: EmployeesContainerProps) {
-  const encodedFilterText = encodeURIComponent(filterText);
+export function EmployeeListContainer({
+  filterName,
+  filterDetail,
+}: EmployeesContainerProps) {
+  const searchParams = new URLSearchParams();
+  searchParams.append('filterName', filterName);
+  filterDetail.forEach(({ key, value }) => {
+    if (value.length > 0) {
+      searchParams.append(key, value.join(','));
+    }
+  });
+
+  const queryString = searchParams.toString();
+
   const { data, error, isLoading } = useSWR<Employee[], Error>(
-    `/api/employees?filterText=${encodedFilterText}`,
-    employeesFetcher
+    `/api/employees?${queryString}`,
+    employeesFetcher,
   );
   useEffect(() => {
     if (error != null) {
-      console.error(`Failed to fetch employees filtered by filterText`, error);
+      console.error('Failed to fetch employees filtered by filterName', error);
     }
-  }, [error, filterText]);
+  }, [error]);
   if (data != null) {
     return data.map((employee) => (
       <EmployeeListItem employee={employee} key={employee.id} />

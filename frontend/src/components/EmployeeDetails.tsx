@@ -1,11 +1,11 @@
-import PersonIcon from "@mui/icons-material/Person";
-import { Avatar, Box, Paper, Tab, Tabs, Typography } from "@mui/material";
-import { Employee } from "../models/Employee";
-import { useCallback, useState } from "react";
+import PersonIcon from '@mui/icons-material/Person';
+import { Avatar, Box, Chip, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import type { Employee } from '../models/Employee';
 
 const tabPanelValue = {
-  basicInfo: "基本情報",
-  others: "その他",
+  basicInfo: '基本情報',
+  others: 'その他',
 };
 
 type TabPanelValue = keyof typeof tabPanelValue;
@@ -34,20 +34,20 @@ export type EmployeeDetailsProps = {
 
 export function EmployeeDetails(prop: EmployeeDetailsProps) {
   const [selectedTabValue, setSelectedTabValue] =
-    useState<TabPanelValue>("basicInfo");
+    useState<TabPanelValue>('basicInfo');
   const employee = prop.employee;
 
   const handleTabValueChange = useCallback(
     (event: React.SyntheticEvent, newValue: TabPanelValue) => {
       setSelectedTabValue(newValue);
     },
-    []
+    [],
   );
 
   return (
     <Paper sx={{ p: 2 }}>
       <Box
-        display={"flex"}
+        display={'flex'}
         flexDirection="column"
         alignItems="flex-start"
         gap={1}
@@ -64,21 +64,34 @@ export function EmployeeDetails(prop: EmployeeDetailsProps) {
           </Avatar>
           <Typography variant="h5">{employee.name}</Typography>
         </Box>
-        <Box sx={{ borderBottom: 1, borderColor: "divider", width: "100%" }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={selectedTabValue} onChange={handleTabValueChange}>
-            <Tab label={tabPanelValue.basicInfo} value={"basicInfo"} />
-            <Tab label={tabPanelValue.others} value={"others"} />
+            <Tab label={tabPanelValue.basicInfo} value={'basicInfo'} />
+            <Tab label={tabPanelValue.others} value={'others'} />
           </Tabs>
         </Box>
 
-        <TabContent value={"basicInfo"} selectedValue={selectedTabValue}>
+        <TabContent value={'basicInfo'} selectedValue={selectedTabValue}>
           <Box p={2} display="flex" flexDirection="column" gap={1}>
             <Typography variant="h6">基本情報</Typography>
             <Typography>年齢：{employee.age}歳</Typography>
+            <Typography>所属：{employee.department}</Typography>
+            <Typography>役職：{employee.position}</Typography>
+            <Typography>スキル：</Typography>
+            <Box display="flex" gap={1} flexWrap="wrap">
+              {employee.skill.map((s) => (
+                <Chip
+                  key={s}
+                  sx={{ marginRight: 0.5 }}
+                  color="info"
+                  label={s}
+                />
+              ))}
+            </Box>
           </Box>
         </TabContent>
 
-        <TabContent value={"others"} selectedValue={selectedTabValue}>
+        <TabContent value={'others'} selectedValue={selectedTabValue}>
           <Box p={2} display="flex" flexDirection="column" gap={1}>
             <Typography variant="h6">その他</Typography>
           </Box>
