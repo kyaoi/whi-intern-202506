@@ -1,5 +1,5 @@
-import { SearchEmployees } from "../components/SearchEmployees";
-import { GlobalContainer } from "@/components/GlobalContainer";
+import { SearchEmployees } from '../components/SearchEmployees';
+import { GlobalContainer } from '@/components/GlobalContainer';
 
 export default function Home() {
   return (
