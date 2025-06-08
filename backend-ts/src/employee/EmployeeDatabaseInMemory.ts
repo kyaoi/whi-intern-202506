@@ -45,4 +45,11 @@ export class EmployeeDatabaseInMemory implements EmployeeDatabase {
       employee.name.toLowerCase().includes(filterText.toLowerCase())
     );
   }
+
+  async addEmployee(employee: Employee): Promise<void> {
+    if (this.employees.has(employee.id)) {
+      throw new Error(`Employee with id ${employee.id} already exists.`);
+    }
+    this.employees.set(employee.id, employee);
+  }
 }
