@@ -1,5 +1,5 @@
 "use client";
-import { type FilterOptions, employeeKeys } from "@/types/employee";
+import type { AttributesOptions, SelectOptions } from "@/types/employee";
 import {
 	Box,
 	Button,
@@ -21,7 +21,7 @@ import { EmployeeListContainer } from "./EmployeeListContainer";
 
 export function SearchEmployees() {
 	const [searchKeyword, setSearchKeyword] = useState("");
-	const [searchDetail, setSearchDetail] = useState<FilterOptions[]>([]);
+	const [searchDetail, setSearchDetail] = useState<SelectOptions[]>([]);
 
 	const [open, setOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export function SearchEmployees() {
 		setOpen(true);
 	};
 
-	const handleAccept = (data: FilterOptions[]) => {
+	const handleAccept = (data: SelectOptions[]) => {
 		setOpen(false);
 		setSearchDetail(data);
 	};
@@ -81,7 +81,7 @@ export function SearchEmployees() {
 }
 
 type SearchModalProps = {
-	handleAccept: (data: FilterOptions[]) => void;
+	handleAccept: (data: SelectOptions[]) => void;
 	handleCancel: () => void;
 	open: boolean;
 };
@@ -91,7 +91,7 @@ const SearchModal = ({
 	handleAccept,
 	handleCancel,
 }: SearchModalProps) => {
-	const [selectedFilters, setSelectedFilters] = useState<FilterOptions[]>([]);
+	const [selectedFilters, setSelectedFilters] = useState<SelectOptions[]>([]);
 
 	return (
 		<Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
@@ -115,48 +115,56 @@ const SearchModal = ({
 	);
 };
 
-const attributesFetcher = async (url: string): Promise<FilterOptions[]> => {
+const attributesFetcher = async (url: string): Promise<AttributesOptions[]> => {
 	const response = await fetch(url);
 	if (!response.ok) {
 		throw new Error(`Failed to fetch employees at ${url}`);
 	}
 	const body = await response.json();
+	console.log("Fetched attributes:", body);
+
 	return body;
 };
 
 type SearchModalContentProps = {
-	selectedFilters: FilterOptions[];
-	setSelectedFilters: React.Dispatch<React.SetStateAction<FilterOptions[]>>;
+	selectedFilters: SelectOptions[];
+	setSelectedFilters: React.Dispatch<React.SetStateAction<SelectOptions[]>>;
 };
-
-const mockData = [
-	{ key: "department", value: ["Development", "Sales", "マーケティング"] },
-	{ key: "position", value: ["マネージャー", "デザイナー"] },
-	{ key: "skill", value: ["React", "Vue", "Go", "Photoshop", "Leadership"] },
-];
 
 const SearchModalContent = ({
 	selectedFilters,
 	setSelectedFilters,
 }: SearchModalContentProps) => {
-	// FIXME: replace mock data
-	const [filterOptions, setFilterOptions] = useState<FilterOptions[]>(mockData);
+	const [attributesOptions, setAttributesOptions] = useState<
+		AttributesOptions[]
+	>([]);
 
-	const { data, error, isLoading } = useSWR<FilterOptions[], Error>(
+	const { data, error, isLoading } = useSWR<AttributesOptions[], Error>(
 		"/api/attributes",
 		attributesFetcher,
 	);
+
+	useEffect(() => {
+		if (data) {
+			console.log("Fetched filter options:", data);
+			setAttributesOptions(data);
+		}
+	}, [data]);
+
 	useEffect(() => {
 		if (error != null) {
 			console.error("Failed to fetch employees filtered by filterName", error);
 		}
 	}, [error]);
-	if (data != null) {
-		setFilterOptions(data);
-	}
 
 	if (isLoading) {
 		return <p>Loading...</p>;
+	}
+
+	if (!attributesOptions || attributesOptions.length === 0) {
+		return (
+			<Typography variant="body1">No filter options available.</Typography>
+		);
 	}
 
 	const handleCheck = (key: string, value: string) => {
@@ -182,30 +190,28 @@ const SearchModalContent = ({
 
 	return (
 		<DialogContent>
-			{employeeKeys.map(({ key, label }) => (
+			{attributesOptions.map(({ key, label, value }) => (
 				<Box key={key} mb={2}>
 					<Typography variant="subtitle1" gutterBottom>
 						{label}
 					</Typography>
 					<FormGroup>
-						{filterOptions
-							?.find((opt) => opt.key === key)
-							?.value.map((v) => (
-								<FormControlLabel
-									key={v}
-									control={
-										<Checkbox
-											checked={
-												selectedFilters.find(
-													(f) => f.key === key && f.value.includes(v),
-												) !== undefined
-											}
-											onChange={() => handleCheck(key, v)}
-										/>
-									}
-									label={v}
-								/>
-							))}
+						{value.map((v) => (
+							<FormControlLabel
+								key={v}
+								control={
+									<Checkbox
+										checked={
+											selectedFilters.find(
+												(f) => f.key === key && f.value.includes(v),
+											) !== undefined
+										}
+										onChange={() => handleCheck(key, v)}
+									/>
+								}
+								label={v}
+							/>
+						))}
 					</FormGroup>
 				</Box>
 			))}

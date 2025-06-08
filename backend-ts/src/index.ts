@@ -65,6 +65,20 @@ app.get("/api/employees/:userId", async (req: Request, res: Response) => {
 	}
 });
 
+// TODO: ここは別のディレクトリ移動する
+// TODO: アーキテクチャに沿ったやり方に変更
+app.get("/api/attributes", async (req: Request, res: Response) => {
+	console.log("Loading attributes");
+
+	try {
+		const attribute = await database.getAttributes();
+		res.status(200).send(JSON.stringify(attribute));
+	} catch (e) {
+		console.error("Failed to load the attributes", e);
+		res.status(500).send();
+	}
+});
+
 app.listen(port, () => {
 	console.log(`App listening on the port ${port}`);
 });
